@@ -72,9 +72,22 @@ export interface SiteCopy {
     payloadHeading: string;
     builtBy: string;
     langSwitch: string;
+    source: string;
+    madeBy: string;
+    developers: string;
+    about: string;
+    contact: string;
+    paramsHeading: string;
+    paramsIntro: string;
+    colParameter: string;
+    colField: string;
+    colAliases: string;
   };
   home: HomeCopy;
   staticVsDynamic: ArticlePageCopy;
   privacy: ArticlePageCopy;
+  developers: ArticlePageCopy;
+  about: ArticlePageCopy;
+  contact: ArticlePageCopy;
   types: Record<string, TypePageCopy>;
 }

@@ -12,7 +12,8 @@
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "astro check"
+    "check": "astro check",
+    "og": "node scripts/og.mjs"
   },
   "dependencies": {
     "@astrojs/preact": "^6.0.5",

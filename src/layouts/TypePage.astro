@@ -9,6 +9,10 @@ import OtherTypes from '../components/OtherTypes.astro';
 import Faq from '../components/Faq.astro';
 import { getCopy } from '../copy';
 import { localizePath, type Lang } from '../lib/i18n';
+import JsonLd from '../components/JsonLd.astro';
+import { getType } from '../lib/payloads';
+import { breadcrumbs, faqPage, webApplication } from '../lib/schema';
+import { alternates } from '../lib/pages';
 
 interface Props {
   typeId: string;
@@ -18,10 +22,22 @@ interface Props {
 const { typeId, lang = 'en' } = Astro.props;
 const site = getCopy(lang);
 const copy = site.types[typeId]!;
+const origin = Astro.site!.origin;
+const key = getType(typeId).path;
+const path = localizePath(key, lang);
+const schema = [
+  webApplication(origin, `${origin}${path}`, copy.h1, copy.description),
+  faqPage(copy.faqs),
+  breadcrumbs(origin, [
+    { name: site.chrome.builtBy, path: localizePath('/', lang) },
+    { name: copy.h1, path },
+  ]),
+];
 ---
 
-<Base title={copy.title} description={copy.description} lang={lang}>
-  <SiteHeader lang={lang} />
+<Base title={copy.title} description={copy.description} lang={lang} alternates={alternates(key, origin)}>
+  <JsonLd slot="head" data={schema} />
+  <SiteHeader lang={lang} pageKey={key} />
   <main class="mx-auto w-full max-w-page px-5 pt-6 pb-8 sm:pt-10">
     <h1 class="h-display">{copy.h1}</h1>
     <p class="h-lead">{copy.lead}</p>

@@ -1,0 +1,17 @@
+---
+import TypePage from '../../layouts/TypePage.astro';
+import { QR_TYPES } from '../../lib/payloads';
+import { localizePath } from '../../lib/i18n';
+
+export function getStaticPaths() {
+  // Spanish slugs come from the slug map: /phone becomes /es/telefono.
+  return QR_TYPES.filter((type) => type.path !== '/').map((type) => ({
+    params: { type: localizePath(type.path, 'es').replace('/es/', '') },
+    props: { typeId: type.id },
+  }));
+}
+
+const { typeId } = Astro.props;
+---
+
+<TypePage typeId={typeId} lang="es" />

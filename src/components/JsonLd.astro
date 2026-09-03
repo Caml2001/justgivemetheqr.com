@@ -1,0 +1,10 @@
+---
+/** Emits one JSON-LD block. `</script>` in content is escaped, nothing else is needed. */
+interface Props {
+  data: Record<string, unknown> | Record<string, unknown>[];
+}
+const { data } = Astro.props;
+const json = JSON.stringify(data).replace(/<\//g, '<\\/');
+---
+
+<script type="application/ld+json" set:html={json} />

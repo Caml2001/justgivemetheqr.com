@@ -1,0 +1,9 @@
+---
+import ArticlePage from '../../layouts/ArticlePage.astro';
+import { getCopy } from '../../copy';
+
+const lang = 'es';
+const copy = getCopy(lang).about;
+---
+
+<ArticlePage copy={copy} lang={lang} pageKey="/about" />

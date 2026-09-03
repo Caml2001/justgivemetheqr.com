@@ -5,10 +5,18 @@ interface Props {
   title: string;
   description: string;
   lang?: 'en' | 'es';
+  /** Keep utility pages (404) out of the index. */
+  noindex?: boolean;
+  /** hreflang set; omitted on pages that exist in one language only. */
+  alternates?: Array<{ lang: string; href: string }>;
 }
 
-const { title, description, lang = 'en' } = Astro.props;
-const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
+const { title, description, lang = 'en', noindex = false, alternates = [] } = Astro.props;
+// With build.format 'file' the build-time pathname is /wifi.html; the URL
+// Cloudflare actually serves (and redirects .html to) is /wifi.
+const path = Astro.url.pathname.replace(/(index)?\.html$/, '').replace(/\/$/, '') || '/';
+const canonical = new URL(path, Astro.site).href;
+const image = new URL('/og.png', Astro.site);
 ---
 
 <!doctype html>
@@ -19,12 +27,25 @@ const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.si
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
     <meta name="generator" content={Astro.generator} />
+    <meta property="og:site_name" content="Just Give Me The QR" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="1200" />
+    <meta property="og:image:alt" content="A QR code that opens justgivemetheqr.com" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
     <slot name="head" />
   </head>
   <body class="min-h-screen">

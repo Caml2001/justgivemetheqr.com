@@ -1,0 +1,54 @@
+---
+import ArticlePage from './ArticlePage.astro';
+import { getCopy } from '../copy';
+import { QR_TYPES } from '../lib/payloads';
+import { getUi, type Lang } from '../lib/i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const site = getCopy(lang);
+const copy = site.developers;
+const ui = getUi(lang);
+---
+
+<ArticlePage copy={copy} lang={lang} pageKey="/developers">
+  <section slot="after">
+    <h2>{site.chrome.paramsHeading}</h2>
+    <p>{site.chrome.paramsIntro}</p>
+    {
+      QR_TYPES.map((type) => (
+        <div class="mt-6">
+          <h3>
+            {ui.types[type.id] ?? type.label} — <code>{type.path}</code>
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-[0.9375rem]">
+              <thead>
+                <tr class="text-left text-muted">
+                  <th class="py-1 pr-4 font-medium">{site.chrome.colParameter}</th>
+                  <th class="py-1 pr-4 font-medium">{site.chrome.colField}</th>
+                  <th class="py-1 font-medium">{site.chrome.colAliases}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {type.fields.map((f) => (
+                  <tr class="border-t border-line">
+                    <td class="py-1.5 pr-4 font-mono">{f.name}</td>
+                    <td class="py-1.5 pr-4">{ui.fields[`${type.id}.${f.name}`] ?? f.label}{f.options ? ` (${f.options.map((o) => o.value).join(' / ')})` : ''}</td>
+                    <td class="py-1.5 font-mono text-muted">{(f.aliases ?? []).join(', ')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-2">
+            <code>{type.path}?{type.fields.slice(0, 2).map((f) => `${f.name}=…`).join('&')}</code>
+          </p>
+        </div>
+      ))
+    }
+  </section>
+</ArticlePage>

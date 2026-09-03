@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import QRCode from 'qrcode';
-import { geometry, matrix, rasterize, svg, EYE_SHAPES, MODULE_SHAPES, type StyleInput } from '../src/lib/render';
+import { crop, geometry, matrix, rasterize, svg, EYE_SHAPES, MODULE_SHAPES, type StyleInput } from '../src/lib/render';
 import { STYLE_PRESETS } from '../src/lib/presets';
 import { LOGO_FRACTION } from '../src/lib/qr';
 import { wifi } from '../src/lib/payloads';
@@ -27,14 +27,17 @@ function scan(payload: string, style: Partial<StyleInput>, ec: 'L' | 'M' | 'Q' |
 }
 
 describe('styled rendering', () => {
-  it('draws the classic style exactly like the reference bitmap', () => {
-    const payload = PAYLOADS[0]!;
-    const qr = QRCode.create(payload, { errorCorrectionLevel: 'M' });
-    const raster = rasterize(geometry(matrix(payload, 'M'), { ...base, margin: 0 }), 1);
-    for (let row = 0; row < qr.modules.size; row++) {
-      for (let column = 0; column < qr.modules.size; column++) {
-        const dark = raster.data[(row * raster.width + column) * 4] === 0;
-        expect(dark, `module ${row},${column}`).toBe(qr.modules.get(row, column) === 1);
+  it('draws the classic style exactly like the reference bitmap, alignment patterns included', () => {
+    // Version 1 has no alignment pattern, version 5 has one, version 10 has
+    // a 3×3 grid minus the corners — every placement rule gets exercised.
+    for (const payload of ['hi', PAYLOADS[1]!, 'x'.repeat(300)]) {
+      const qr = QRCode.create(payload, { errorCorrectionLevel: 'M' });
+      const raster = rasterize(geometry(matrix(payload, 'M'), { ...base, margin: 0 }), 1);
+      for (let row = 0; row < qr.modules.size; row++) {
+        for (let column = 0; column < qr.modules.size; column++) {
+          const dark = raster.data[(row * raster.width + column) * 4] === 0;
+          expect(dark, `v${(qr.modules.size - 17) / 4} module ${row},${column}`).toBe(qr.modules.get(row, column) === 1);
+        }
       }
     }
   });
@@ -82,8 +85,18 @@ describe('styled rendering', () => {
     expect(markup.startsWith('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ')).toBe(true);
     expect(markup).toContain('width="1024" height="1024"');
     expect(markup).toContain('<image ');
+    // One path per colour run, never one element per module.
+    expect(markup).toContain('<defs>');
+    expect(markup.length).toBeLessThan(60_000);
     expect(markup).toContain('href="data:image/png;base64,AAA&quot;&lt;x"');
     expect(markup).not.toContain('crispEdges');
+  });
+
+  it('crops to the top-left corner for thumbnails', () => {
+    const g = crop(geometry(matrix('x', 'L'), { ...base, margin: 1 }), 11);
+    expect(g.units).toBe(11);
+    expect(g.primitives.length).toBeLessThan(80);
+    expect(svg(g).length).toBeLessThan(4_000);
   });
 
   it('marks the plain square style as crisp for pixel snapping', () => {

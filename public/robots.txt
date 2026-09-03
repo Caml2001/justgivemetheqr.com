@@ -1,0 +1,6 @@
+# Everyone is welcome, crawlers and agents included. There is nothing to hide:
+# the site is static files and the code is public.
+User-agent: *
+Allow: /
+
+Sitemap: https://justgivemetheqr.com/sitemap.xml

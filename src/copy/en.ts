@@ -14,6 +14,16 @@ const chrome: SiteCopy['chrome'] = {
   payloadHeading: 'What goes inside the code',
   builtBy: 'Just Give Me The QR',
   langSwitch: 'Español',
+  source: 'Source code on GitHub',
+  madeBy: 'Made by',
+  developers: 'Prefill links',
+  about: 'About',
+  contact: 'Contact',
+  paramsHeading: 'Parameters by type',
+  paramsIntro: 'Field names are the query parameters. Aliases are accepted as well.',
+  colParameter: 'Parameter',
+  colField: 'Field',
+  colAliases: 'Aliases',
 };
 
 const home: HomeCopy = {
@@ -34,15 +44,15 @@ const home: HomeCopy = {
     {
       heading: 'What you get',
       body: [
-        'Nine kinds of code — links, WiFi, WhatsApp, contact cards, plain text, email, SMS, phone numbers and map locations. PNG at up to 2048&nbsp;px for print, or SVG for anything that needs to scale. Your own colours, your own quiet zone, your own error-correction level. No watermark, no daily limit, no email address required.',
-        'The whole tool is one page of JavaScript running on your device. Your data never touches a server because there is no server to touch — the site is a handful of static files. That is not a privacy promise we are asking you to believe; it is just how the thing is built.',
+        'Nine kinds of code — links, WiFi, WhatsApp, contact cards, plain text, email, SMS, phone numbers and map locations. PNG at up to 2048&nbsp;px for print, or SVG for anything that needs to scale. Your own colours, six shapes for the modules and the eyes, a logo in the middle if you want one, your own quiet zone and error-correction level. No watermark, no daily limit, no email address required.',
+        'The whole tool is one page of JavaScript running on your device. Your data never touches a server because there is no server to touch — the site is a handful of static files. That is not a privacy promise we are asking you to believe; it is just how the thing is built — and <a href="https://github.com/Caml2001/justgivemetheqr.com">the code is public</a>, so you can read it.',
       ],
     },
     {
       heading: 'What this does not do',
       body: [
         'No scan tracking and no editable destinations. Both require a redirect server, and a redirect server is exactly the thing that can be switched off. If you genuinely need to change where a printed code points, <a href="/static-vs-dynamic">read this first</a> — there is a way to get most of that without renting anything.',
-        'No logo in the middle of the code, not yet. No bulk generation from a spreadsheet. No account, so nothing is saved between visits — if you want a code back, generate it again or keep the file.',
+        'No bulk generation from a spreadsheet. No account, so nothing is saved between visits — if you want a code back, generate it again or keep the file. The logo you add stays in your browser tab too, so it is gone when you close it.',
       ],
     },
   ],
@@ -61,7 +71,7 @@ const home: HomeCopy = {
     },
     {
       q: 'Can you see what I put into the generator?',
-      a: 'No. The QR code is drawn on your device by JavaScript running in your browser tab. Nothing is sent anywhere — you can check by opening your browser network tools while you type, or by going offline and watching the generator keep working.',
+      a: 'No. The QR code is drawn on your device by JavaScript running in your browser tab. Nothing is sent anywhere — you can check by opening your browser network tools while you type, or by going offline and watching the generator keep working. If you would rather read than test, <a href="https://github.com/Caml2001/justgivemetheqr.com">the source is on GitHub</a>.',
     },
     {
       q: 'Can I use these commercially?',
@@ -168,7 +178,7 @@ const privacy: ArticlePageCopy = {
       heading: 'What happens to what you type',
       body: [
         'Nothing leaves your browser. Links, WiFi passwords, phone numbers, contact details — all of it is turned into a QR code by JavaScript running on your own device, and the resulting image is drawn locally. No request is made to any server with your content in it, because the site has no server to send it to.',
-        'You do not have to take our word for it. Open your browser’s network tab and type into the generator: you will see no requests. Or load the page, disconnect from the internet, and keep generating codes — it works fine offline.',
+        'You do not have to take our word for it. Open your browser’s network tab and type into the generator: you will see no requests. Or load the page, disconnect from the internet, and keep generating codes — it works fine offline. And the whole site is open source: <a href="https://github.com/Caml2001/justgivemetheqr.com">the code is on GitHub</a>.',
       ],
     },
     {
@@ -207,5 +217,109 @@ const privacy: ArticlePageCopy = {
   },
 };
 
-export { chrome, home, staticVsDynamic, privacy };
+
+const developers: ArticlePageCopy = {
+  title: 'Prefill links — link into the QR generator',
+  description:
+    'Every field of every QR type can be prefilled from a link. Parameter names, aliases and examples for embedding or linking to the generator.',
+  h1: 'Prefill links',
+  lead: 'Open the generator with the fields already filled in. Nothing is downloaded until the person clicks.',
+  sections: [
+    {
+      heading: 'How it works',
+      body: [
+        'Every generator page reads its own fields from the query string. Send someone to <code>/wifi?ssid=Cafe%20Guest&amp;password=flatwhite</code> and they land on the WiFi generator with both fields filled in and the code already drawn. They still choose whether to download it — a link never triggers a download, and it never sets colours or shapes, which stay with the person making the code.',
+        'This is the whole "API". There is no endpoint that returns an image, because there is no server: the QR code is rendered by JavaScript in the visitor’s browser. What you get instead is a stable link format you can build from a spreadsheet, a CMS, a chatbot or a printed instruction.',
+      ],
+    },
+    {
+      heading: 'Notes on values',
+      body: [
+        'URL-encode everything. Spaces become <code>%20</code>, ampersands <code>%26</code>, line breaks <code>%0A</code>. Boolean fields such as <em>hidden</em> accept <code>true</code>, <code>1</code>, <code>yes</code> or <code>on</code>. The home page also accepts <code>type=</code> to preselect a content type without visiting its own page.',
+        'Anything you put in a link is visible to whoever sees the link, including a WiFi password. That is a property of links, not of this site, but it is worth remembering before you paste one into a group chat.',
+        'A machine-readable description of the same parameters is published as an <a href="/openapi.json">OpenAPI document</a>, and a plain-text summary for language models at <a href="/llms.txt">/llms.txt</a>.',
+      ],
+    },
+  ],
+  faqs: [
+    {
+      q: 'Can I get a PNG back from a URL?',
+      a: 'No. Nothing is generated on a server. If you need images in bulk, the code is open source — run it yourself.',
+    },
+    {
+      q: 'Can a link set the colours or the logo?',
+      a: 'No, on purpose. Only content fields are prefillable, so a link cannot decide how someone else’s code looks.',
+    },
+    {
+      q: 'Will the link format change?',
+      a: 'Field names are the ones shown in the form and are meant to be stable. Aliases exist so that short links keep working.',
+    },
+    {
+      q: 'Is there a rate limit?',
+      a: 'There is nothing to limit. The pages are static files on a CDN.',
+    },
+  ],
+};
+
+const about: ArticlePageCopy = {
+  title: 'About — why Just Give Me The QR exists',
+  description:
+    'A free, no-signup QR code generator that runs entirely in your browser, built out of frustration with free tools that quietly turn into subscriptions.',
+  h1: 'About',
+  lead: 'One person, one page of JavaScript, and a grudge against QR codes that stop working.',
+  sections: [
+    {
+      heading: 'Why it was built',
+      body: [
+        'The first version of this site came from a very ordinary experience: needing a QR code for a menu, using a "free" generator, and finding a month later that the code opened an upgrade page instead of the menu. The generator had not broken. It had handed out a dynamic code — a short link to its own server — and switched the redirect off when the trial ended.',
+        'A QR code is a cheap, thirty-year-old standard that a phone can read with no help from anyone. The only reason a code stops working is that someone put a server between the pattern and the destination and then turned it off. This site exists to make the other kind, and to explain the difference plainly enough that fewer people get caught.',
+      ],
+    },
+    {
+      heading: 'What it is',
+      body: [
+        'A static site: a handful of HTML pages and one small JavaScript file that draws QR codes on your device. No accounts, no database, no analytics by default, no uploads. It is hosted on a CDN, costs almost nothing to run, and would keep every code it ever made working even if it went offline tomorrow, because the codes never depended on it in the first place.',
+        'The whole thing is open source. <a href="https://github.com/Caml2001/justgivemetheqr.com">The code is on GitHub</a>, including the tests that render every kind of code to pixels and scan it back to prove it decodes.',
+      ],
+    },
+    {
+      heading: 'Who',
+      body: [
+        'Made by <a href="https://charlymtz.com">charlymtz.com</a>. Bug reports, corrections to the copy and feature ideas are welcome through the <a href="/contact">contact page</a>.',
+      ],
+    },
+  ],
+};
+
+const contact: ArticlePageCopy = {
+  title: 'Contact — bugs, corrections and ideas',
+  description:
+    'How to report a bug, correct something on the site or suggest a feature. No support desk, no ticket system — a public issue tracker and a person.',
+  h1: 'Contact',
+  lead: 'There is no support desk, because there is nothing to support: no accounts, no subscriptions, no data. There is a person, though.',
+  sections: [
+    {
+      heading: 'Found a bug or a wrong claim?',
+      body: [
+        'Open an issue on <a href="https://github.com/Caml2001/justgivemetheqr.com/issues">the GitHub repository</a>. That is the fastest route, it is public so others can find the same answer, and it is where fixes actually happen. If a code made here does not scan on a specific phone, say which content type, which phone and which scanner app — the same information a test needs.',
+        'If you would rather not use GitHub, the author can be reached through <a href="https://charlymtz.com">charlymtz.com</a>.',
+      ],
+    },
+    {
+      heading: 'Things that are not a bug',
+      body: [
+        'A printed code that stopped working because the destination page moved is not something this site can fix — the code still says exactly what it said on the day it was made. Point it at a URL you control next time; the <a href="/static-vs-dynamic">static-vs-dynamic page</a> explains how.',
+        'Requests for scan tracking or editable destinations will be declined kindly. Both require a redirect server, which is the one thing this site promises never to be.',
+      ],
+    },
+    {
+      heading: 'Business, press and licensing',
+      body: [
+        'The generator is free for personal and commercial use, with no attribution required. There is nothing to license and no partner programme. If you want to write about the site, everything worth quoting is already on it, and the source is public.',
+      ],
+    },
+  ],
+};
+
+export { chrome, home, staticVsDynamic, privacy, developers, about, contact };
 export type { TypePageCopy };

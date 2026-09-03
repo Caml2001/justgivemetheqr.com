@@ -19,7 +19,7 @@ import {
   type QrSize,
 } from '../lib/qr';
 import { format, getUi, type Lang, type UiStrings } from '../lib/i18n';
-import StylePanel from './StylePanel';
+import StylePanel, { StyleGallery } from './StylePanel';
 import { presetFor } from '../lib/presets';
 
 interface Props {
@@ -175,7 +175,7 @@ export default function Generator({ lang = 'en', type: initialType = 'url' }: Pr
   return (
     <div class="rounded-block bg-surface p-4 sm:p-6 md:p-8">
       <fieldset class="mb-6">
-        <legend class="sr-only">{ui.contentType}</legend>
+        <legend class="mb-2 text-sm text-muted">{ui.contentType}</legend>
         <div class="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
           {QR_TYPES.map((t) => (
             <label key={t.id} class="chip" data-active={t.id === typeId}>
@@ -192,9 +192,8 @@ export default function Generator({ lang = 'en', type: initialType = 'url' }: Pr
         </div>
       </fieldset>
 
-      <div class="grid gap-8 md:grid-cols-[minmax(0,1fr)_19rem] md:gap-10 lg:grid-cols-[minmax(0,1fr)_21rem]">
-      <div class="min-w-0">
-
+      <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_19rem] md:grid-rows-[auto_1fr] md:gap-x-10 lg:grid-cols-[minmax(0,1fr)_21rem]">
+      <div class="min-w-0 md:col-start-1 md:row-start-1">
         <div class="grid gap-4 sm:grid-cols-2">
           {type.fields.map((field) => (
             <Field
@@ -208,53 +207,10 @@ export default function Generator({ lang = 'en', type: initialType = 'url' }: Pr
             />
           ))}
         </div>
-
-        <div class="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <button
-            type="button"
-            class="flex items-center gap-2 text-sm"
-            aria-expanded={showOptions}
-            aria-controls="qr-appearance"
-            onClick={() => setShowOptions((v) => !v)}
-          >
-            <Chevron open={showOptions} />
-            <span class="font-medium">{ui.optionsHeading}</span>
-            <span class="flex items-center gap-1.5 text-muted" aria-hidden="true">
-              <Swatch colour={options.foreground} />
-              <Swatch colour={options.background} />
-            </span>
-            <span class="text-muted">
-              {styleName ? `${styleName}, ` : ''}
-              {format(ui.sizeShort, { size: options.size })}, {format(ui.ecShort, { ec: options.ec })}
-            </span>
-          </button>
-          {!isEmpty && (
-            <button type="button" class="link text-sm text-muted" onClick={clear}>
-              {ui.reset}
-            </button>
-          )}
-        </div>
-
-        <div id="qr-appearance" hidden={!showOptions}>
-          <Options ui={ui} options={options} onChange={setOptions} />
-        </div>
-
-        {!isEmpty && (
-          <details class="mt-6 text-sm">
-            <summary class="link cursor-pointer text-muted">
-              {ui.payloadHeading}
-              <span class="ml-2 font-mono text-xs">
-                {format(ui.bytesUsed, { used, max })}
-              </span>
-            </summary>
-            <pre class="mt-3 overflow-x-auto rounded-field bg-surface p-3 font-mono text-xs leading-relaxed break-all whitespace-pre-wrap">
-              {data}
-            </pre>
-          </details>
-        )}
       </div>
 
-      <div class="md:sticky md:top-6 md:self-start">
+      <div class="md:col-start-2 md:row-start-1 md:row-span-2">
+      <div class="md:sticky md:top-6">
         <div
           class="rounded-card p-5 shadow-card"
           style={{ background: options.background }}
@@ -310,6 +266,57 @@ export default function Generator({ lang = 'en', type: initialType = 'url' }: Pr
           {lowContrast && <p class="rounded-field bg-danger-surface p-3 text-danger">{ui.contrastWarning}</p>}
           {inverted && <p class="rounded-field bg-warn-surface p-3 text-warn">{ui.invertedWarning}</p>}
         </div>
+      </div>
+      </div>
+
+      <div class="min-w-0 md:col-start-1 md:row-start-2">
+        <div>
+          <StyleGallery ui={ui} options={options} onChange={setOptions} />
+        </div>
+
+        <div class="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <button
+            type="button"
+            class="flex items-center gap-2 text-sm"
+            aria-expanded={showOptions}
+            aria-controls="qr-appearance"
+            onClick={() => setShowOptions((v) => !v)}
+          >
+            <Chevron open={showOptions} />
+            <span class="font-medium">{ui.optionsHeading}</span>
+            <span class="flex items-center gap-1.5 text-muted" aria-hidden="true">
+              <Swatch colour={options.foreground} />
+              <Swatch colour={options.background} />
+            </span>
+            <span class="hidden text-muted sm:inline">
+              {styleName ? `${styleName}, ` : ''}
+              {format(ui.sizeShort, { size: options.size })}, {format(ui.ecShort, { ec: options.ec })}
+            </span>
+          </button>
+          {!isEmpty && (
+            <button type="button" class="link text-sm text-muted" onClick={clear}>
+              {ui.reset}
+            </button>
+          )}
+        </div>
+
+        <div id="qr-appearance" hidden={!showOptions}>
+          <Options ui={ui} options={options} onChange={setOptions} />
+        </div>
+
+        {!isEmpty && (
+          <details class="mt-6 text-sm">
+            <summary class="link cursor-pointer text-muted">
+              {ui.payloadHeading}
+              <span class="ml-2 font-mono text-xs">
+                {format(ui.bytesUsed, { used, max })}
+              </span>
+            </summary>
+            <pre class="mt-3 overflow-x-auto rounded-field bg-surface p-3 font-mono text-xs leading-relaxed break-all whitespace-pre-wrap">
+              {data}
+            </pre>
+          </details>
+        )}
       </div>
       </div>
     </div>
@@ -370,9 +377,12 @@ function Field({ typeId, field, value, label, ui, onInput }: FieldProps) {
     );
   };
 
-  const help = field.help && (
+  const key = `${typeId}.${field.name}`;
+  const helpText = ui.help[key] ?? field.help;
+  const placeholder = ui.placeholders[key] ?? field.placeholder;
+  const help = helpText && (
     <p id={describedBy} class="mt-1.5 text-sm text-muted">
-      {field.help}
+      {helpText}
     </p>
   );
 
@@ -402,12 +412,12 @@ function Field({ typeId, field, value, label, ui, onInput }: FieldProps) {
         {label}
       </label>
       {field.kind === 'textarea' ? (
-        <textarea {...shared} rows={field.rows ?? 3} value={String(value)} placeholder={field.placeholder} onInput={handle} />
+        <textarea {...shared} rows={field.rows ?? 3} value={String(value)} placeholder={placeholder} onInput={handle} />
       ) : field.kind === 'select' ? (
         <select {...shared} value={String(value)} onChange={handle}>
           {(field.options ?? []).map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label}
+              {ui.options[`${key}.${option.value}`] ?? option.label}
             </option>
           ))}
         </select>
@@ -417,7 +427,7 @@ function Field({ typeId, field, value, label, ui, onInput }: FieldProps) {
             {...shared}
             type={field.kind === 'password' ? (revealed ? 'text' : 'password') : field.kind}
             value={String(value)}
-            placeholder={field.placeholder}
+            placeholder={placeholder}
             inputMode={field.inputMode}
             autocomplete={field.kind === 'password' ? 'off' : field.autocomplete}
             spellcheck={field.kind === 'password' ? false : undefined}

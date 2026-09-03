@@ -74,6 +74,31 @@ function finderOrigin(size: number, row: number, column: number): [number, numbe
   return null;
 }
 
+/**
+ * Alignment-pattern centres, mirroring the encoder's own placement so the
+ * picture and the data agree. Version 1 has none; larger symbols have a grid.
+ */
+function alignmentCentres(size: number): Array<[number, number]> {
+  const version = (size - 17) / 4;
+  if (version < 2) return [];
+  const count = Math.floor(version / 7) + 2;
+  const interval = size === 145 ? 26 : Math.ceil((size - 13) / (2 * count - 2)) * 2;
+  const positions = [size - 7];
+  for (let i = 1; i < count - 1; i++) positions[i] = positions[i - 1]! - interval;
+  positions.push(6);
+  positions.reverse();
+
+  const centres: Array<[number, number]> = [];
+  for (let i = 0; i < positions.length; i++) {
+    for (let j = 0; j < positions.length; j++) {
+      // The three corners are taken by finder patterns.
+      if ((i === 0 && j === 0) || (i === 0 && j === positions.length - 1) || (i === positions.length - 1 && j === 0)) continue;
+      centres.push([positions[i]!, positions[j]!]);
+    }
+  }
+  return centres;
+}
+
 /** Corner radius per eye shape for each of the three concentric squares. */
 const EYE_RADII: Record<EyeShape, [outer: number, hole: number, centre: number]> = {
   square: [0, 0, 0],
@@ -97,9 +122,15 @@ export function geometry(m: Matrix, style: StyleInput): Geometry {
 
   const primitives: Primitive[] = [{ kind: 'rect', x: 0, y: 0, w: units, h: units, r: 0, fill: background }];
 
+  // Alignment patterns are structural, like the eyes: scanners locate them by
+  // their solid 1:1:1:1:1 profile, which dotted modules would break.
+  const alignment = alignmentCentres(m.size);
+  const inAlignment = (row: number, column: number) =>
+    alignment.some(([r, c]) => Math.abs(row - r) <= 2 && Math.abs(column - c) <= 2);
+
   for (let row = 0; row < m.size; row++) {
     for (let column = 0; column < m.size; column++) {
-      if (!m.get(row, column) || finderOrigin(m.size, row, column)) continue;
+      if (!m.get(row, column) || finderOrigin(m.size, row, column) || inAlignment(row, column)) continue;
       const x = column + margin;
       const y = row + margin;
       if (style.modules === 'dot') {
@@ -121,6 +152,15 @@ export function geometry(m: Matrix, style: StyleInput): Geometry {
     primitives.push(ring(x, y, 7, outerR, style.eyes, eyeColour));
     primitives.push(ring(x + 1, y + 1, 5, holeR, style.eyes, background));
     primitives.push(ring(x + 2, y + 2, 3, centreR, style.eyes, eyeColour));
+  }
+
+  // Drawn as small eyes: 5-unit ring, 3-unit hole, 1-unit centre.
+  for (const [r, c] of alignment) {
+    const x = c - 2 + margin;
+    const y = r - 2 + margin;
+    primitives.push(ring(x, y, 5, outerR * (5 / 7), style.eyes, foreground));
+    primitives.push(ring(x + 1, y + 1, 3, holeR * (3 / 5), style.eyes, background));
+    primitives.push(ring(x + 2, y + 2, 1, centreR / 3, style.eyes, foreground));
   }
 
   let logoBox: Box | null = null;
@@ -208,16 +248,52 @@ export interface SvgOptions {
   logoHref?: string;
 }
 
+function squarePath(p: Extract<Primitive, { kind: 'rect' }>): string {
+  return `M${fmt(p.x)} ${fmt(p.y)}h${fmt(p.w)}v${fmt(p.h)}h${fmt(-p.w)}z`;
+}
+
+/** Stable id for a reusable shape definition. */
+function shapeId(p: Primitive): string {
+  return p.kind === 'circle' ? `c${fmt(p.r)}` : `r${fmt(p.w)}-${fmt(p.h)}-${fmt(p.r)}`;
+}
+
+function shapeDef(id: string, p: Primitive): string {
+  if (p.kind === 'circle') return `<circle id="${id}" r="${fmt(p.r)}"/>`;
+  const r = Math.min(p.r, p.w / 2, p.h / 2);
+  return `<rect id="${id}" width="${fmt(p.w)}" height="${fmt(p.h)}" rx="${fmt(r)}"/>`;
+}
+
+/**
+ * Plain squares of one colour collapse into a single <path>. Curved shapes
+ * are defined once and placed with <use>, which is far smaller than spelling
+ * out arcs per module. Paint order is preserved either way.
+ */
 export function svg(g: Geometry, options: SvgOptions = {}): string {
+  const defs = new Map<string, string>();
   const parts: string[] = [];
+  let squares: { fill: string; d: string[] } | null = null;
+  const flush = () => {
+    if (squares) parts.push(`<path fill="${squares.fill}" d="${squares.d.join('')}"/>`);
+    squares = null;
+  };
+
   for (const p of g.primitives) {
-    if (p.kind === 'circle') {
-      parts.push(`<circle cx="${fmt(p.cx)}" cy="${fmt(p.cy)}" r="${fmt(p.r)}" fill="${p.fill}"/>`);
-    } else {
-      const rx = p.r > 0 ? ` rx="${fmt(Math.min(p.r, p.w / 2, p.h / 2))}"` : '';
-      parts.push(`<rect x="${fmt(p.x)}" y="${fmt(p.y)}" width="${fmt(p.w)}" height="${fmt(p.h)}"${rx} fill="${p.fill}"/>`);
+    if (p.kind === 'rect' && p.r <= 0) {
+      if (squares && squares.fill === p.fill) squares.d.push(squarePath(p));
+      else {
+        flush();
+        squares = { fill: p.fill, d: [squarePath(p)] };
+      }
+      continue;
     }
+    flush();
+    const id = shapeId(p);
+    if (!defs.has(id)) defs.set(id, shapeDef(id, p));
+    const [x, y] = p.kind === 'circle' ? [p.cx, p.cy] : [p.x, p.y];
+    parts.push(`<use href="#${id}" x="${fmt(x)}" y="${fmt(y)}" fill="${p.fill}"/>`);
   }
+  flush();
+
   if (g.logoBox && options.logoHref) {
     const { x, y, w, h } = g.logoBox;
     // Data URLs never contain quotes or angle brackets, but the href is user
@@ -229,7 +305,18 @@ export function svg(g: Geometry, options: SvgOptions = {}): string {
   }
   const size = options.width ? ` width="${options.width}" height="${options.width}"` : '';
   const rendering = g.crisp ? ' shape-rendering="crispEdges"' : '';
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${g.units} ${g.units}"${size}${rendering}>${parts.join('')}</svg>\n`;
+  const defsMarkup = defs.size ? `<defs>${[...defs.values()].join('')}</defs>` : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${g.units} ${g.units}"${size}${rendering}>${defsMarkup}${parts.join('')}</svg>\n`;
+}
+
+/**
+ * The top-left corner of a code: one eye and a patch of modules. Enough to
+ * judge a style, a fraction of the markup of a whole symbol.
+ */
+export function crop(g: Geometry, units: number): Geometry {
+  const inside = (p: Primitive) =>
+    p.kind === 'circle' ? p.cx - p.r < units && p.cy - p.r < units : p.x < units && p.y < units;
+  return { ...g, units, primitives: g.primitives.filter(inside) };
 }
 
 // --- Canvas -------------------------------------------------------------------

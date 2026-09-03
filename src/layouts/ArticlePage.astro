@@ -4,29 +4,48 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import Sections from '../components/Sections.astro';
 import Faq from '../components/Faq.astro';
+import JsonLd from '../components/JsonLd.astro';
 import type { ArticlePageCopy } from '../copy/types';
 import { getCopy } from '../copy';
-import type { Lang } from '../lib/i18n';
+import { localizePath, type Lang } from '../lib/i18n';
+import { article, breadcrumbs, faqPage } from '../lib/schema';
+import { alternates } from '../lib/pages';
 
 interface Props {
   copy: ArticlePageCopy;
   lang?: Lang;
   /** Extra sections appended after the authored ones (privacy uses this). */
   extraSections?: ArticlePageCopy['sections'];
+  /** English path of this page (`/privacy`); the localized path is derived. */
+  pageKey: string;
 }
 
-const { copy, lang = 'en', extraSections = [] } = Astro.props;
+const { copy, lang = 'en', extraSections = [], pageKey } = Astro.props;
+const path = localizePath(pageKey, lang);
 const site = getCopy(lang);
+const origin = Astro.site!.origin;
+const url = `${origin}${path}`;
+
+const schema = [
+  article(origin, url, copy.h1, copy.description),
+  breadcrumbs(origin, [
+    { name: site.chrome.builtBy, path: localizePath('/', lang) },
+    { name: copy.h1, path },
+  ]),
+  ...(copy.faqs?.length ? [faqPage(copy.faqs)] : []),
+];
 ---
 
-<Base title={copy.title} description={copy.description} lang={lang}>
-  <SiteHeader lang={lang} />
+<Base title={copy.title} description={copy.description} lang={lang} alternates={alternates(pageKey, origin)}>
+  <JsonLd slot="head" data={schema} />
+  <SiteHeader lang={lang} pageKey={pageKey} />
   <main class="mx-auto w-full max-w-page px-5 pt-6 pb-8 sm:pt-10">
     <h1 class="h-display">{copy.h1}</h1>
     <p class="h-lead">{copy.lead}</p>
 
     <article class="copy mt-8">
       <Sections sections={[...copy.sections, ...extraSections]} />
+      <slot name="after" />
     </article>
 
     {copy.faqs && <Faq heading={site.chrome.faqHeading} faqs={copy.faqs} />}

@@ -1,0 +1,50 @@
+---
+import Base from './Base.astro';
+import Generator from '../components/Generator.tsx';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Sections from '../components/Sections.astro';
+import OtherTypes from '../components/OtherTypes.astro';
+import Faq from '../components/Faq.astro';
+import { getCopy } from '../copy';
+import JsonLd from '../components/JsonLd.astro';
+import { faqPage, organization, webApplication } from '../lib/schema';
+
+import { alternates } from '../lib/pages';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const site = getCopy(lang);
+const copy = site.home;
+const origin = Astro.site!.origin;
+const schema = [
+  organization(origin),
+  webApplication(origin, `${origin}/`, site.chrome.builtBy, copy.description),
+  faqPage(copy.faqs),
+];
+---
+
+<Base title={copy.title} description={copy.description} lang={lang} alternates={alternates('/', origin)}>
+  <JsonLd slot="head" data={schema} />
+  <SiteHeader lang={lang} pageKey="/" />
+  <main class="mx-auto w-full max-w-page px-5 pt-6 pb-8 sm:pt-10">
+    <h1 class="h-display">{copy.h1}</h1>
+    <p class="h-lead">{copy.lead}</p>
+
+    <div id="generator" class="mt-8 scroll-mt-4 sm:mt-10">
+      <Generator client:load type="url" lang={lang} />
+    </div>
+
+    <article class="copy mt-20">
+      <Sections sections={copy.sections} />
+    </article>
+
+    <Faq heading={site.chrome.faqHeading} faqs={copy.faqs} />
+    <OtherTypes heading={site.chrome.otherTypes} current="url" lang={lang} />
+  </main>
+  <SiteFooter lang={lang} />
+</Base>

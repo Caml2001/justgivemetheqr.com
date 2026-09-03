@@ -1,0 +1,13 @@
+---
+import ArticlePage from '../../layouts/ArticlePage.astro';
+import { getCopy } from '../../copy';
+import { ANALYTICS_ENABLED } from '../../lib/analytics';
+
+const lang = 'es';
+const copy = getCopy(lang).privacy;
+
+// Same flag as the script tag, so the page can never disagree with reality.
+const analyticsSection = ANALYTICS_ENABLED ? copy.analytics!.on : copy.analytics!.off;
+---
+
+<ArticlePage copy={copy} lang={lang} extraSections={[analyticsSection]} pageKey="/privacy" />

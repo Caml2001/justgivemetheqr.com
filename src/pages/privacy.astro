@@ -10,4 +10,4 @@ const copy = getCopy(lang).privacy;
 const analyticsSection = ANALYTICS_ENABLED ? copy.analytics!.on : copy.analytics!.off;
 ---
 
-<ArticlePage copy={copy} lang={lang} extraSections={[analyticsSection]} />
+<ArticlePage copy={copy} lang={lang} extraSections={[analyticsSection]} pageKey="/privacy" />

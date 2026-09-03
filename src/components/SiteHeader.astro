@@ -5,9 +5,12 @@ import { localizePath, type Lang } from '../lib/i18n';
 
 interface Props {
   lang?: Lang;
+  /** English path of the current page, so the language link lands on its twin. */
+  pageKey?: string;
 }
 
-const { lang = 'en' } = Astro.props;
+const { lang = 'en', pageKey = '/' } = Astro.props;
+const other: Lang = lang === 'en' ? 'es' : 'en';
 const copy = getCopy(lang);
 const link = (path: string) => localizePath(path, lang);
 ---
@@ -28,6 +31,7 @@ const link = (path: string) => localizePath(path, lang);
       <ul class="flex flex-wrap gap-x-5 gap-y-1 text-small">
         <li><a href={link('/static-vs-dynamic')} class="link">{copy.chrome.whyStatic}</a></li>
         <li><a href={link('/privacy')} class="link">{copy.chrome.privacy}</a></li>
+        <li><a href={localizePath(pageKey, other)} hreflang={other} lang={other} class="link">{copy.chrome.langSwitch}</a></li>
       </ul>
     </nav>
   </div>

@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+const title = 'Page not found';
+const description = 'That address does not exist here. The generator, the code types and the docs are one click away.';
+---
+
+<Base title={title} description={description} noindex>
+  <SiteHeader />
+  <main class="mx-auto w-full max-w-page px-5 pt-10 pb-8">
+    <h1 class="text-[2.5rem] leading-[1.05] font-bold tracking-[-0.03em]">404 — not here</h1>
+    <p class="mt-3 max-w-xl text-lg text-muted">
+      Nothing lives at this address. Nothing ever did, or it moved — either way there is no redirect
+      server here to guess for you.
+    </p>
+    <ul class="mt-8 grid max-w-md gap-2 text-[1.0625rem]">
+      <li><a href="/" class="link">Make a QR code</a></li>
+      <li><a href="/developers" class="link">Link into the generator with prefilled fields</a></li>
+      <li><a href="/static-vs-dynamic" class="link">Why these codes cannot expire</a></li>
+      <li><a href="/sitemap.xml" class="link">Sitemap</a> and <a href="/llms.txt" class="link">llms.txt</a></li>
+    </ul>
+    <pre class="mt-8 max-w-md overflow-x-auto rounded-field bg-surface p-4 font-mono text-[0.8125rem] leading-relaxed">{`# 404 — not found
+
+Where to look next:
+- Generator: /
+- All pages: /sitemap.xml
+- For agents: /llms.txt and /openapi.json
+- Prefill link docs: /developers`}</pre>
+  </main>
+  <SiteFooter />
+</Base>

@@ -2,6 +2,7 @@
 import { getCopy } from '../copy';
 import { QR_TYPES } from '../lib/payloads';
 import { getUi, localizePath, type Lang } from '../lib/i18n';
+import { AUTHOR_NAME, AUTHOR_URL, REPO_URL } from '../lib/site';
 
 interface Props {
   lang?: Lang;
@@ -20,7 +21,14 @@ const link = (path: string) => localizePath(path, lang);
       <ul class="mt-4 flex flex-wrap gap-x-5 gap-y-1">
         <li><a href={link('/static-vs-dynamic')} class="link">{copy.chrome.whyStatic}</a></li>
         <li><a href={link('/privacy')} class="link">{copy.chrome.privacy}</a></li>
+        <li><a href={link('/developers')} class="link">{copy.chrome.developers}</a></li>
+        <li><a href={link('/about')} class="link">{copy.chrome.about}</a></li>
+        <li><a href={link('/contact')} class="link">{copy.chrome.contact}</a></li>
+        <li><a href={REPO_URL} class="link" rel="noopener">{copy.chrome.source}</a></li>
       </ul>
+      <p class="mt-6 text-muted">
+        {copy.chrome.madeBy} <a href={AUTHOR_URL} class="link" rel="noopener">{AUTHOR_NAME}</a>
+      </p>
     </div>
     <nav aria-label={copy.chrome.types}>
       <p class="mb-2 font-medium">{copy.chrome.types}</p>

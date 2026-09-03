@@ -1,0 +1,13 @@
+---
+import ArticlePage from '../layouts/ArticlePage.astro';
+import { getCopy } from '../copy';
+import { ANALYTICS_ENABLED } from '../lib/analytics';
+
+const lang = 'en';
+const copy = getCopy(lang).privacy;
+
+// The page has to describe what is actually running, not what we hope is.
+const analyticsSection = ANALYTICS_ENABLED ? copy.analytics!.on : copy.analytics!.off;
+---
+
+<ArticlePage copy={copy} lang={lang} extraSections={[analyticsSection]} />

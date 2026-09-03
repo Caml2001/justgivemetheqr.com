@@ -1,0 +1,23 @@
+---
+import type { Section } from '../copy/types';
+
+interface Props {
+  sections: Section[];
+  /** Heading level, so a page never jumps from h1 to h3. */
+  level?: 2 | 3;
+}
+
+const { sections, level = 2 } = Astro.props;
+const Heading = `h${level}` as 'h2' | 'h3';
+---
+
+{
+  sections.map((section) => (
+    <section>
+      <Heading>{section.heading}</Heading>
+      {section.body.map((paragraph) => (
+        <p set:html={paragraph} />
+      ))}
+    </section>
+  ))
+}

@@ -1,0 +1,49 @@
+---
+import Base from './Base.astro';
+import Generator from '../components/Generator.tsx';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Sections from '../components/Sections.astro';
+import PayloadExample from '../components/PayloadExample.astro';
+import OtherTypes from '../components/OtherTypes.astro';
+import Faq from '../components/Faq.astro';
+import { getCopy } from '../copy';
+import { localizePath, type Lang } from '../lib/i18n';
+
+interface Props {
+  typeId: string;
+  lang?: Lang;
+}
+
+const { typeId, lang = 'en' } = Astro.props;
+const site = getCopy(lang);
+const copy = site.types[typeId]!;
+---
+
+<Base title={copy.title} description={copy.description} lang={lang}>
+  <SiteHeader lang={lang} />
+  <main class="mx-auto w-full max-w-page px-5 pt-6 pb-8 sm:pt-10">
+    <h1 class="h-display">{copy.h1}</h1>
+    <p class="h-lead">{copy.lead}</p>
+
+    <div id="generator" class="mt-8 scroll-mt-4 sm:mt-10">
+      <Generator client:load type={typeId} lang={lang} />
+    </div>
+
+    <article class="copy mt-20">
+      <Sections sections={copy.sections} />
+      <PayloadExample heading={site.chrome.payloadHeading} payload={copy.payload} />
+      <h2>{copy.tipsHeading}</h2>
+      <ul class="list-disc pl-5">
+        {copy.tips.map((tip) => <li set:html={tip} />)}
+      </ul>
+      <p class="mt-6">
+        <a href={localizePath('/static-vs-dynamic', lang)}>{site.chrome.readMore}</a>
+      </p>
+    </article>
+
+    <Faq heading={site.chrome.faqHeading} faqs={copy.faqs} />
+    <OtherTypes heading={site.chrome.otherTypes} current={typeId} lang={lang} />
+  </main>
+  <SiteFooter lang={lang} />
+</Base>

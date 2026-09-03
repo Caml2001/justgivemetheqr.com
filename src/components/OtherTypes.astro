@@ -1,0 +1,28 @@
+---
+import { QR_TYPES } from '../lib/payloads';
+import { getUi, localizePath, type Lang } from '../lib/i18n';
+
+interface Props {
+  heading: string;
+  /** The current page's type, excluded from the list. */
+  current?: string;
+  lang?: Lang;
+}
+
+const { heading, current, lang = 'en' } = Astro.props;
+const ui = getUi(lang);
+const others = QR_TYPES.filter((type) => type.id !== current);
+---
+
+<nav class="mt-16" aria-label={heading}>
+  <h2 class="mb-4 text-section font-semibold tracking-tight">{heading}</h2>
+  <ul class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+    {others.map((type) => (
+      <li>
+        <a href={localizePath(type.path, lang)} class="btn btn-secondary w-full justify-start font-normal">
+          {ui.types[type.id] ?? type.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

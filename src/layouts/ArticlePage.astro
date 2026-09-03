@@ -1,0 +1,35 @@
+---
+import Base from './Base.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Sections from '../components/Sections.astro';
+import Faq from '../components/Faq.astro';
+import type { ArticlePageCopy } from '../copy/types';
+import { getCopy } from '../copy';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  copy: ArticlePageCopy;
+  lang?: Lang;
+  /** Extra sections appended after the authored ones (privacy uses this). */
+  extraSections?: ArticlePageCopy['sections'];
+}
+
+const { copy, lang = 'en', extraSections = [] } = Astro.props;
+const site = getCopy(lang);
+---
+
+<Base title={copy.title} description={copy.description} lang={lang}>
+  <SiteHeader lang={lang} />
+  <main class="mx-auto w-full max-w-page px-5 pt-6 pb-8 sm:pt-10">
+    <h1 class="h-display">{copy.h1}</h1>
+    <p class="h-lead">{copy.lead}</p>
+
+    <article class="copy mt-8">
+      <Sections sections={[...copy.sections, ...extraSections]} />
+    </article>
+
+    {copy.faqs && <Faq heading={site.chrome.faqHeading} faqs={copy.faqs} />}
+  </main>
+  <SiteFooter lang={lang} />
+</Base>

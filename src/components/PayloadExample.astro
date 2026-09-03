@@ -1,0 +1,21 @@
+---
+import type { PayloadExample } from '../copy/types';
+
+interface Props {
+  heading: string;
+  payload: PayloadExample;
+}
+
+const { heading, payload } = Astro.props;
+---
+
+<section>
+  <h2>{heading}</h2>
+  <p>{payload.caption}</p>
+  <pre class="mb-4 overflow-x-auto rounded-field bg-surface p-4 font-mono text-small leading-relaxed"><code>{payload.code}</code></pre>
+  {payload.legend && (
+    <ul class="mb-4 list-disc pl-5">
+      {payload.legend.map((item) => <li set:html={item} />)}
+    </ul>
+  )}
+</section>

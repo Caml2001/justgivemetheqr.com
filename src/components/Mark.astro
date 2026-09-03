@@ -1,0 +1,14 @@
+---
+/** The three finder patterns of a QR code — the one shape everyone recognises. */
+interface Props {
+  class?: string;
+}
+const { class: className = 'h-5 w-5' } = Astro.props;
+---
+
+<svg viewBox="0 0 21 21" class={className} aria-hidden="true" shape-rendering="crispEdges">
+  <path
+    fill="currentColor"
+    d="M0 0h9v9H0zm2 2v5h5V2zM3 3h3v3H3zM12 0h9v9h-9zm2 2v5h5V2zm1 1h3v3h-3zM0 12h9v9H0zm2 2v5h5v-5zm1 1h3v3H3zM12 12h2v2h-2zm4 0h2v2h-2zm-2 2h2v2h-2zm4 0h2v2h-2zm-6 2h2v2h-2zm4 0h2v2h-2zm-2 2h2v2h-2zm4 0h2v2h-2z"
+  ></path>
+</svg>

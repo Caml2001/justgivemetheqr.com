@@ -1,0 +1,34 @@
+---
+import Base from '../layouts/Base.astro';
+import Generator from '../components/Generator.tsx';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Sections from '../components/Sections.astro';
+import OtherTypes from '../components/OtherTypes.astro';
+import Faq from '../components/Faq.astro';
+import { getCopy } from '../copy';
+
+const lang = 'en';
+const site = getCopy(lang);
+const copy = site.home;
+---
+
+<Base title={copy.title} description={copy.description} lang={lang}>
+  <SiteHeader lang={lang} />
+  <main class="mx-auto w-full max-w-page px-5 pt-6 pb-8 sm:pt-10">
+    <h1 class="h-display">{copy.h1}</h1>
+    <p class="h-lead">{copy.lead}</p>
+
+    <div id="generator" class="mt-8 scroll-mt-4 sm:mt-10">
+      <Generator client:load type="url" lang={lang} />
+    </div>
+
+    <article class="copy mt-20">
+      <Sections sections={copy.sections} />
+    </article>
+
+    <Faq heading={site.chrome.faqHeading} faqs={copy.faqs} />
+    <OtherTypes heading={site.chrome.otherTypes} current="url" lang={lang} />
+  </main>
+  <SiteFooter lang={lang} />
+</Base>

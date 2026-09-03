@@ -1,0 +1,116 @@
+/*
+ * ─────────────────────────────────────────────────────────────────────────
+ *  THEME — the one file to edit when changing how the site looks.
+ *
+ *  Every colour, type size, radius and measure used anywhere on the site is
+ *  defined here and nowhere else. Components reference these through Tailwind
+ *  utilities (bg-paper, text-muted, rounded-card, text-display…) that are
+ *  generated from the @theme block at the bottom, so changing a value here
+ *  changes it everywhere.
+ *
+ *  Preview: run `npm run dev` and open http://localhost:4321/design — a page
+ *  that only exists in development and shows every component side by side.
+ * ─────────────────────────────────────────────────────────────────────────
+ */
+
+:root {
+  /*
+   * Colour. Each token is written as light-dark(light, dark): the browser
+   * picks the side that matches the viewer's theme, and the /design page
+   * can force either side by setting data-theme on <html>.
+   *
+   * The palette is the QR code's own: ink on paper, with colour reserved
+   * for state — copied, warning, error.
+   */
+  color-scheme: light dark;
+
+  --paper: light-dark(#ffffff, #000000); /* page background */
+  --ink: light-dark(#000000, #ffffff); /* text, primary button, active chip */
+  --muted: light-dark(#5f5f5f, #a3a3a3); /* secondary text; ≥ 4.5:1 on paper */
+  --line: light-dark(#e4e4e4, #2a2a2a); /* borders, dividers */
+  --surface: light-dark(#f4f4f4, #161616); /* the generator block, code blocks */
+
+  --signal: light-dark(#15803d, #4ade80); /* success: "Copied" */
+  --warn: light-dark(#a16207, #fbbf24); /* caution, e.g. inverted code */
+  --warn-surface: light-dark(#fef9e7, #1f1a0a);
+  --danger: light-dark(#b91c1c, #f87171); /* errors, low contrast */
+  --danger-surface: light-dark(#fdf2f2, #1f0d0d);
+
+  /* Type. System fonts; the monospace is used only for data. */
+  --ff-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --ff-mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  /* Type scale, roughly a 1.25 ratio. Roles, not sizes, so a change stays coherent. */
+  --fs-small: 0.875rem; /* 14px — helper text, footer, chips */
+  --fs-body: 1rem; /* 16px — UI text, inputs */
+  --fs-copy: 1.0625rem; /* 17px — long-form paragraphs */
+  --fs-lead: 1.25rem; /* 20px — the line under a heading */
+  --fs-section: 1.5625rem; /* 25px — h2 */
+  --fs-title: 2.5rem; /* 40px — h1 on phones */
+  --fs-display: 3.5rem; /* 56px — h1 on desktop */
+
+  /* Shape. */
+  --r-field: 0.375rem; /* inputs, buttons, code blocks */
+  --r-card: 0.75rem; /* the QR card */
+  --r-block: 1rem; /* the generator block */
+
+  /* Measure. */
+  --measure: 40rem; /* max width of long-form copy: ~70 characters */
+  --page: 64rem; /* max width of the page */
+
+  /* Shadow, used once: under the printed card. */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.08), 0 8px 24px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Forced theme, used by /design and available to anything else that wants it. */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/*
+ * Tailwind bridge. Names on the left become utilities:
+ *   --color-paper   → bg-paper, text-paper, border-paper…
+ *   --radius-card   → rounded-card
+ *   --text-display  → text-display
+ * Nothing below should need editing when changing values above.
+ */
+@theme inline {
+  --color-*: initial;
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-surface: var(--surface);
+  --color-signal: var(--signal);
+  --color-warn: var(--warn);
+  --color-warn-surface: var(--warn-surface);
+  --color-danger: var(--danger);
+  --color-danger-surface: var(--danger-surface);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+
+  --font-sans: var(--ff-sans);
+  --font-mono: var(--ff-mono);
+
+  --text-small: var(--fs-small);
+  --text-body: var(--fs-body);
+  --text-copy: var(--fs-copy);
+  --text-lead: var(--fs-lead);
+  --text-section: var(--fs-section);
+  --text-title: var(--fs-title);
+  --text-display: var(--fs-display);
+
+  --radius-field: var(--r-field);
+  --radius-card: var(--r-card);
+  --radius-block: var(--r-block);
+
+  --container-measure: var(--measure);
+  --container-page: var(--page);
+
+  --shadow-card: var(--shadow-card);
+}

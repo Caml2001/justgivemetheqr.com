@@ -1,0 +1,9 @@
+---
+import ArticlePage from '../layouts/ArticlePage.astro';
+import { getCopy } from '../copy';
+
+const lang = 'en';
+const copy = getCopy(lang).staticVsDynamic;
+---
+
+<ArticlePage copy={copy} lang={lang} />

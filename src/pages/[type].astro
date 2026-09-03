@@ -1,0 +1,16 @@
+---
+import TypePage from '../layouts/TypePage.astro';
+import { QR_TYPES } from '../lib/payloads';
+
+export function getStaticPaths() {
+  // The URL type lives at `/`, so it has no page of its own here.
+  return QR_TYPES.filter((type) => type.path !== '/').map((type) => ({
+    params: { type: type.path.replace('/', '') },
+    props: { typeId: type.id },
+  }));
+}
+
+const { typeId } = Astro.props;
+---
+
+<TypePage typeId={typeId} lang="en" />

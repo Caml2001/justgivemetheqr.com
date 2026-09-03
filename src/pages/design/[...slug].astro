@@ -1,0 +1,195 @@
+---
+/**
+ * Style guide. Exists only in development: `getStaticPaths` returns nothing
+ * in a production build, so the page is never emitted or listed.
+ * Edit `src/styles/theme.css` and watch this page.
+ */
+import Base from '../../layouts/Base.astro';
+import Generator from '../../components/Generator.tsx';
+import Mark from '../../components/Mark.astro';
+import Faq from '../../components/Faq.astro';
+import { QR_TYPES } from '../../lib/payloads';
+import { getUi } from '../../lib/i18n';
+
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { slug: undefined } }] : [];
+}
+
+const ui = getUi('en');
+
+const colours = [
+  ['paper', 'Page background'],
+  ['ink', 'Text, primary button, active chip'],
+  ['muted', 'Secondary text'],
+  ['line', 'Borders and dividers'],
+  ['surface', 'Generator block, code'],
+  ['signal', 'Success'],
+  ['warn', 'Caution'],
+  ['warn-surface', 'Caution background'],
+  ['danger', 'Error'],
+  ['danger-surface', 'Error background'],
+];
+
+const sizes = [
+  ['display', 'h1 on desktop'],
+  ['title', 'h1 on phones'],
+  ['section', 'h2'],
+  ['lead', 'Line under a heading, big input'],
+  ['copy', 'Long-form paragraphs'],
+  ['body', 'Interface text'],
+  ['small', 'Helper text, chips, footer'],
+];
+
+const sampleFaqs = [
+  { q: 'Is this page shipped?', a: 'No. It is generated only when <code>import.meta.env.DEV</code> is true, so <code>npm run build</code> never emits it.' },
+  { q: 'Where do I change things?', a: '<code>src/styles/theme.css</code> for values, <code>src/styles/global.css</code> for how components use them.' },
+];
+---
+
+<Base title="Design" description="Development-only style guide." lang="en">
+  <div class="mx-auto w-full max-w-page px-5 py-8">
+    <header class="mb-12 flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="flex items-center gap-2.5 font-mono text-small font-semibold"><Mark /> Just Give Me The QR</p>
+        <h1 class="h-display mt-4">Design</h1>
+        <p class="h-lead">
+          Every value on this page comes from <code class="rounded bg-surface px-1.5 py-0.5 font-mono text-[0.875em]">src/styles/theme.css</code>. Change it, save, and watch.
+        </p>
+      </div>
+      <fieldset class="flex gap-2" id="theme-switch">
+        <legend class="sr-only">Theme</legend>
+        {['system', 'light', 'dark'].map((theme) => (
+          <label class="chip" data-active={theme === 'system'}>
+            <input type="radio" name="theme" value={theme} class="sr-only" checked={theme === 'system'} />
+            {theme}
+          </label>
+        ))}
+      </fieldset>
+    </header>
+
+    <section class="mb-16">
+      <h2 class="mb-4 text-section font-semibold tracking-tight">Colour</h2>
+      <ul class="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        {colours.map(([name, role]) => (
+          <li class="rounded-card border border-line p-3">
+            <div class="mb-3 h-14 rounded-field border border-line" style={`background: var(--${name})`}></div>
+            <p class="font-mono text-small font-semibold">--{name}</p>
+            <p class="font-mono text-xs text-muted" data-token={name}></p>
+            <p class="mt-1 text-small text-muted">{role}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="mb-4 text-section font-semibold tracking-tight">Type</h2>
+      <ul class="divide-y divide-line border-y border-line">
+        {sizes.map(([name, role]) => (
+          <li class="grid items-baseline gap-2 py-4 sm:grid-cols-[10rem_1fr]">
+            <p class="font-mono text-small text-muted">--fs-{name} <span data-size={name}></span></p>
+            <p class={`text-${name} leading-tight font-semibold tracking-tight`}>Just give me the QR <span class="ml-3 font-normal text-muted text-small">{role}</span></p>
+          </li>
+        ))}
+      </ul>
+      <p class="copy mt-6">
+        Long-form copy sits on <code>--measure</code>, about seventy characters, in the <code>copy</code> size with relaxed leading. Links are <a href="#">underlined in muted</a> and turn to ink on hover. Data is set in <span class="font-mono">monospace: WIFI:T:WPA;S:Cafe;;</span>.
+      </p>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="mb-4 text-section font-semibold tracking-tight">Controls</h2>
+      <div class="grid gap-8 md:grid-cols-2">
+        <div class="grid gap-3">
+          <p class="text-small text-muted">Buttons</p>
+          <button type="button" class="btn btn-primary">Download PNG</button>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" class="btn btn-secondary">Download SVG</button>
+            <button type="button" class="btn btn-secondary text-signal">Copied</button>
+          </div>
+          <button type="button" class="btn btn-primary" disabled>Disabled</button>
+          <p class="text-small text-muted">Chips</p>
+          <div class="flex flex-wrap gap-2">
+            {QR_TYPES.map((type, index) => (
+              <span class="chip" data-active={index === 0}>{ui.types[type.id]}</span>
+            ))}
+          </div>
+        </div>
+        <div class="grid gap-4">
+          <div>
+            <label class="mb-1.5 block text-small font-medium" for="d-big">Big input</label>
+            <input id="d-big" class="field field-lg" placeholder="https://example.com/menu" />
+          </div>
+          <div>
+            <label class="mb-1.5 block text-small font-medium" for="d-text">Input</label>
+            <input id="d-text" class="field" value="Cafe Guest" />
+            <p class="mt-1.5 text-small text-muted">Helper text under a field.</p>
+          </div>
+          <div>
+            <label class="mb-1.5 block text-small font-medium" for="d-select">Select</label>
+            <select id="d-select" class="field"><option>WPA / WPA2 / WPA3</option><option>WEP</option></select>
+          </div>
+          <label class="flex items-center gap-2.5 text-small"><input type="checkbox" class="h-4 w-4 accent-ink" checked /> Hidden network</label>
+          <div>
+            <label class="mb-1.5 flex justify-between text-small font-medium" for="d-range"><span>Quiet zone</span><span class="font-mono text-muted">4</span></label>
+            <input id="d-range" type="range" min="0" max="10" value="4" class="w-full accent-ink" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="mb-4 text-section font-semibold tracking-tight">Notices</h2>
+      <div class="grid gap-2 text-small md:max-w-md">
+        <p class="rounded-field bg-danger-surface p-3 text-danger">{ui.contrastWarning}</p>
+        <p class="rounded-field bg-warn-surface p-3 text-warn">{ui.invertedWarning}</p>
+        <p class="text-center text-muted">{ui.noUpload}</p>
+      </div>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="mb-4 text-section font-semibold tracking-tight">The generator</h2>
+      <Generator client:load type="wifi" lang="en" />
+    </section>
+
+    <section class="mb-16">
+      <h2 class="mb-4 text-section font-semibold tracking-tight">Copy and FAQ</h2>
+      <article class="copy">
+        <h2>A section heading</h2>
+        <p>A paragraph of long-form copy with <strong>emphasis</strong>, a <a href="#">link</a>, and an inline payload such as <code>geo:41.3874,2.1686</code>. It wraps at the measure so lines stay readable.</p>
+        <ul class="list-disc pl-5"><li>A tip in a list.</li><li>Another one.</li></ul>
+      </article>
+      <Faq heading="Questions" faqs={sampleFaqs} />
+    </section>
+  </div>
+
+  <script>
+    // Theme override for previewing both sides of light-dark() without
+    // touching the OS setting. Nothing is stored.
+    const root = document.documentElement;
+    const chips = document.querySelectorAll<HTMLLabelElement>('#theme-switch .chip');
+    document.querySelectorAll<HTMLInputElement>('#theme-switch input').forEach((input) => {
+      input.addEventListener('change', () => {
+        if (input.value === 'system') delete root.dataset.theme;
+        else root.dataset.theme = input.value;
+        chips.forEach((chip) => (chip.dataset.active = String(chip.contains(input))));
+        paint();
+      });
+    });
+
+    // Show resolved values next to each token.
+    function paint() {
+      const styles = getComputedStyle(root);
+      document.querySelectorAll<HTMLElement>('[data-token]').forEach((el) => {
+        const probe = document.createElement('span');
+        probe.style.color = `var(--${el.dataset.token})`;
+        document.body.appendChild(probe);
+        el.textContent = getComputedStyle(probe).color;
+        probe.remove();
+      });
+      document.querySelectorAll<HTMLElement>('[data-size]').forEach((el) => {
+        el.textContent = styles.getPropertyValue(`--fs-${el.dataset.size}`).trim();
+      });
+    }
+    paint();
+  </script>
+</Base>

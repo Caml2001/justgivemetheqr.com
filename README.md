@@ -135,4 +135,4 @@ Every generator page accepts its fields as query parameters: `/wifi?ssid=Cafe%20
 
 ## Licence
 
-Source available at [github.com/Caml2001/justgivemetheqr.com](https://github.com/Caml2001/justgivemetheqr.com). Made by [charlymtz.com](https://charlymtz.com).
+[MIT](./LICENSE). Source at [github.com/Caml2001/justgivemetheqr.com](https://github.com/Caml2001/justgivemetheqr.com). Made by [charlymtz.com](https://charlymtz.com).

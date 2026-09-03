@@ -70,7 +70,7 @@ export const GET: APIRoute = ({ site }) => {
         'What it does offer is a stable link format: every generator page accepts its fields as query parameters, ' +
         'so an agent can build a link that opens the generator ready to download. There are no error responses, ' +
         'no authentication and no rate limits, because there is nothing but static files.',
-      license: { name: 'Source available', url: REPO_URL },
+      license: { name: 'MIT', url: `${REPO_URL}/blob/main/LICENSE` },
       'x-stability':
         'Field names are the ones shown in each form and are meant to be permanent; aliases exist so short links keep working. ' +
         'There is no versioned path because nothing here is an API that can break: a link that worked once keeps working. ' +
